@@ -1,0 +1,21 @@
+package com.sanedge.pointofsale.domain.requests.cashier;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+@Schema(name = "MonthTotalSalesMerchant", description = "Total penjualan bulanan per merchant")
+public class MonthTotalSalesMerchant {
+    @NotNull
+    @Schema(description = "ID merchant", required = true, example = "123")
+    private Integer merchantId;
+
+    @NotNull
+    @Schema(description = "Tahun", required = true, example = "2025")
+    private Integer year;
+
+    @NotNull
+    @Schema(description = "Bulan", required = true, example = "9")
+    private Integer month;
+}
