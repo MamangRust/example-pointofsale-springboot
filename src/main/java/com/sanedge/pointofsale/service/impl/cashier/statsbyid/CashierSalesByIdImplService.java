@@ -22,94 +22,95 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class CashierSalesByIdImplService implements CashierSalesByIdService {
-    private final CashierSalesByIdRepository cashierSalesByIdRepository;
+        private final CashierSalesByIdRepository cashierSalesByIdRepository;
 
-    @Override
-    public ApiResponse<List<CashierResponseMonthSales>> findMonthlyCashierById(MonthCashierIdRequest req) {
-        log.info("📊 Fetching monthly cashier sales by cashierId | CashierID: {}, Year: {}",
-                req.getCashierId(), req.getYear());
+        @Override
+        public ApiResponse<List<CashierResponseMonthSales>> findMonthlyCashierById(MonthCashierIdRequest req) {
+                log.info("📊 Fetching monthly cashier sales by cashierId | CashierID: {}, Year: {}",
+                                req.getCashierId(), req.getYear());
 
-        if (req.getCashierId() == null || req.getYear() == null) {
-            log.error("❌ CashierId or Year is null | req: {}", req);
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("error")
-                    .message("CashierId and Year must not be null")
-                    .data(List.of())
-                    .build();
+                if (req.getCashierId() == null || req.getYear() == null) {
+                        log.error("❌ CashierId or Year is null | req: {}", req);
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("error")
+                                        .message("CashierId and Year must not be null")
+                                        .data(List.of())
+                                        .build();
+                }
+
+                try {
+                        LocalDate startMonth = LocalDate.of(req.getYear(), 1, 1);
+                        LocalDate nextYear = startMonth.plusYears(1);
+
+                        List<CashierMonthSales> results = cashierSalesByIdRepository.findMonthSalesById(
+                                        req.getCashierId().longValue(),
+                                        req.getYear(),
+                                        startMonth.getMonthValue(),
+                                        nextYear.getMonthValue());
+
+                        List<CashierResponseMonthSales> response = results.stream()
+                                        .map(CashierResponseMonthSales::from)
+                                        .toList();
+
+                        log.info("✅ Found {} monthly cashier sales for cashier {}", response.size(),
+                                        req.getCashierId());
+
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("success")
+                                        .message("Monthly cashier sales by cashier retrieved successfully")
+                                        .data(response)
+                                        .build();
+
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch monthly cashier sales by cashier | CashierID: {}, Year: {}",
+                                        req.getCashierId(), req.getYear(), e);
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch monthly cashier sales by cashier")
+                                        .data(List.of())
+                                        .build();
+                }
         }
 
-        try {
-            LocalDate startMonth = LocalDate.of(req.getYear(), 1, 1);
-            LocalDate nextYear = startMonth.plusYears(1);
+        @Override
+        public ApiResponse<List<CashierResponseYearSales>> findYearlyCashierById(YearCashierIdRequest req) {
+                log.info("📊 Fetching yearly cashier sales by cashierId | CashierID: {}, Year: {}",
+                                req.getCashierId(), req.getYear());
 
-            List<CashierMonthSales> results = cashierSalesByIdRepository.findMonthSalesById(
-                    req.getCashierId().longValue(),
-                    req.getYear(),
-                    startMonth.getMonthValue(),
-                    nextYear.getMonthValue());
+                if (req.getCashierId() == null || req.getYear() == null) {
+                        log.error("❌ CashierId or Year is null | req: {}", req);
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("error")
+                                        .message("CashierId and Year must not be null")
+                                        .data(List.of())
+                                        .build();
+                }
 
-            List<CashierResponseMonthSales> response = results.stream()
-                    .map(CashierResponseMonthSales::from)
-                    .toList();
+                try {
+                        List<CashierYearSales> results = cashierSalesByIdRepository.findYearSalesById(
+                                        req.getCashierId().longValue(),
+                                        req.getYear());
 
-            log.info("✅ Found {} monthly cashier sales for cashier {}", response.size(), req.getCashierId());
+                        List<CashierResponseYearSales> response = results.stream()
+                                        .map(CashierResponseYearSales::from)
+                                        .toList();
 
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("success")
-                    .message("Monthly cashier sales by cashier retrieved successfully")
-                    .data(response)
-                    .build();
+                        log.info("✅ Found {} yearly cashier sales for cashier {}", response.size(), req.getCashierId());
 
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch monthly cashier sales by cashier | CashierID: {}, Year: {}",
-                    req.getCashierId(), req.getYear(), e);
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("error")
-                    .message("Failed to fetch monthly cashier sales by cashier")
-                    .data(List.of())
-                    .build();
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("success")
+                                        .message("Yearly cashier sales by cashier retrieved successfully")
+                                        .data(response)
+                                        .build();
+
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch yearly cashier sales by cashier | CashierID: {}, Year: {}",
+                                        req.getCashierId(), req.getYear(), e);
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch yearly cashier sales by cashier")
+                                        .data(List.of())
+                                        .build();
+                }
         }
-    }
-
-    @Override
-    public ApiResponse<List<CashierResponseYearSales>> findYearlyCashierById(YearCashierIdRequest req) {
-        log.info("📊 Fetching yearly cashier sales by cashierId | CashierID: {}, Year: {}",
-                req.getCashierId(), req.getYear());
-
-        if (req.getCashierId() == null || req.getYear() == null) {
-            log.error("❌ CashierId or Year is null | req: {}", req);
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("error")
-                    .message("CashierId and Year must not be null")
-                    .data(List.of())
-                    .build();
-        }
-
-        try {
-            List<CashierYearSales> results = cashierSalesByIdRepository.findYearSalesById(
-                    req.getCashierId().longValue(),
-                    req.getYear());
-
-            List<CashierResponseYearSales> response = results.stream()
-                    .map(CashierResponseYearSales::from)
-                    .toList();
-
-            log.info("✅ Found {} yearly cashier sales for cashier {}", response.size(), req.getCashierId());
-
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("success")
-                    .message("Yearly cashier sales by cashier retrieved successfully")
-                    .data(response)
-                    .build();
-
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch yearly cashier sales by cashier | CashierID: {}, Year: {}",
-                    req.getCashierId(), req.getYear(), e);
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("error")
-                    .message("Failed to fetch yearly cashier sales by cashier")
-                    .data(List.of())
-                    .build();
-        }
-    }
 }

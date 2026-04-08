@@ -8,10 +8,10 @@ import lombok.Data;
 @Schema(name = "MonthTotalSales", description = "Total penjualan bulanan")
 public class MonthTotalSales {
     @NotNull
-    @Schema(description = "Tahun", required = true, example = "2025")
+    @Schema(description = "Tahun", example = "2025")
     private Integer year;
 
     @NotNull
-    @Schema(description = "Bulan", required = true, example = "9")
+    @Schema(description = "Bulan",  example = "9")
     private Integer month;
 }

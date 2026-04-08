@@ -19,17 +19,14 @@ import com.sanedge.pointofsale.models.Role;
 import com.sanedge.pointofsale.repository.role.RoleQueryRepository;
 import com.sanedge.pointofsale.service.role.RoleQueryService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class RoleQueryImplService implements RoleQueryService {
         private RoleQueryRepository roleQueryRepository;
-
-        @Autowired
-        public RoleQueryImplService(RoleQueryRepository roleQueryRepository) {
-                this.roleQueryRepository = roleQueryRepository;
-        }
 
         @Override
         public ApiResponsePagination<List<RoleResponse>> findAll(FindAllRoles req) {

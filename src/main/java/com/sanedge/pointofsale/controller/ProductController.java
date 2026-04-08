@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,17 +37,20 @@ public class ProductController {
     private final ProductCommandService commandService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<ProductResponse>>> findAll(
             @ModelAttribute FindAllProductRequest req) {
         return ResponseEntity.ok(queryService.findAll(req));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<ProductResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(queryService.findById(id));
     }
 
     @GetMapping("/merchant/{merchant_id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<ProductResponse>>> findByMerchant(
             @PathVariable("merchant_id") Integer merchantId,
             @ModelAttribute FindAllProductByMerchantRequest req) {
@@ -54,6 +58,7 @@ public class ProductController {
     }
 
     @GetMapping("/category/{category_name}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<ProductResponse>>> findByCategory(
             @PathVariable("category_name") String categoryName,
             @ModelAttribute FindAllProductByCategoryRequest req) {
@@ -61,12 +66,14 @@ public class ProductController {
     }
 
     @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<ProductResponseDeleteAt>>> findActive(
             @ModelAttribute FindAllProductRequest req) {
         return ResponseEntity.ok(queryService.findActiveProducts(req));
     }
 
     @GetMapping("/trashed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<ProductResponseDeleteAt>>> findTrashed(
             @ModelAttribute FindAllProductRequest req) {
 
@@ -74,6 +81,7 @@ public class ProductController {
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @ModelAttribute CreateProductRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -81,6 +89,7 @@ public class ProductController {
     }
 
     @PostMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Integer id,
             @Valid @ModelAttribute UpdateProductRequest req) {
@@ -89,26 +98,31 @@ public class ProductController {
     }
 
     @PostMapping("/trashed/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponseDeleteAt>> trashedProduct(@PathVariable Integer id) {
         return ResponseEntity.ok(commandService.trashedProduct(id));
     }
 
     @PostMapping("/restore/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponseDeleteAt>> restoreProduct(@PathVariable Integer id) {
         return ResponseEntity.ok(commandService.restoreProduct(id));
     }
 
     @DeleteMapping("/permanent/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteProductPermanent(@PathVariable Integer id) {
         return ResponseEntity.ok(commandService.deleteProductPermanent(id));
     }
 
     @PostMapping("/restore/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> restoreAllProducts() {
         return ResponseEntity.ok(commandService.restoreAllProducts());
     }
 
     @PostMapping("/permanent/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteAllProductsPermanent() {
         return ResponseEntity.ok(commandService.deleteAllProductsPermanent());
     }

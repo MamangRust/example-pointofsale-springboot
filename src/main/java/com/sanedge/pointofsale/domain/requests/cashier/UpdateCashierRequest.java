@@ -9,10 +9,10 @@ import lombok.Data;
 @Schema(name = "UpdateCashierRequest", description = "Request untuk update cashier")
 public class UpdateCashierRequest {
     @NotNull
-    @Schema(description = "ID cashier", required = true, example = "456")
+    @Schema(description = "ID cashier", example = "456")
     private Integer cashierId;
 
     @NotBlank
-    @Schema(description = "Nama cashier", required = true, example = "Jane Doe")
+    @Schema(description = "Nama cashier", example = "Jane Doe")
     private String name;
 }

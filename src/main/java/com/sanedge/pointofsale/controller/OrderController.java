@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -54,23 +55,27 @@ public class OrderController {
     private final OrderTotalRevenueByMerchantService orderTotalRevenueByMerchantService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<OrderResponse>>> findAll(
             @ModelAttribute FindAllOrderRequest req) {
         return ResponseEntity.ok(orderQueryService.findAll(req));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<OrderResponse>> findById(@PathVariable Integer id) {
         return ResponseEntity.ok(orderQueryService.findById(id));
     }
 
     @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<OrderResponseDeleteAt>>> findByActive(
             @ModelAttribute FindAllOrderRequest req) {
         return ResponseEntity.ok(orderQueryService.findByActive(req));
     }
 
     @GetMapping("/trashed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<OrderResponseDeleteAt>>> findByTrashed(
             @ModelAttribute FindAllOrderRequest req) {
 
@@ -78,6 +83,7 @@ public class OrderController {
     }
 
     @GetMapping("/merchant/{merchant_id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<OrderResponse>>> findByMerchant(
             @PathVariable Integer merchant_id,
             @ModelAttribute FindAllOrderByMerchantRequest req) {
@@ -87,59 +93,69 @@ public class OrderController {
     }
 
     @GetMapping("/monthly-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderMonthlyResponse>>> findMonthlyRevenue(
             @RequestParam Integer yearMonth) {
         return ResponseEntity.ok(orderSoldoutService.findMonthlyOrders(yearMonth));
     }
 
     @GetMapping("/yearly-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderYearlyResponse>>> findYearlyRevenue(
             @RequestParam Integer year) {
         return ResponseEntity.ok(orderSoldoutService.findYearlyOrders(year));
     }
 
     @GetMapping("/monthly-total-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderMonthlyTotalRevenueResponse>>> findMonthlyTotalRevenue(
             MonthTotalRevenue req) {
         return ResponseEntity.ok(orderTotalRevenueService.findMonthlyStats(req));
     }
 
     @GetMapping("/yearly-total-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderYearlyTotalRevenueResponse>>> findYearlyTotalRevenue(
             @RequestParam Integer year) {
         return ResponseEntity.ok(orderTotalRevenueService.findYearlyStats(year));
     }
 
     @GetMapping("/merchant/monthly-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderMonthlyResponse>>> findMonthlyRevenueByMerchant(
             MonthOrderMerchantRequest req) {
         return ResponseEntity.ok(orderSoldOutByMerchantService.findMonthlyOrdersByMerchant(req));
     }
 
     @GetMapping("/merchant/yearly-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderYearlyResponse>>> findYearlyRevenueByMerchant(
             YearOrderMerchantRequest req) {
         return ResponseEntity.ok(orderSoldOutByMerchantService.findYearlyOrdersByMerchant(req));
     }
 
     @GetMapping("/merchant/monthly-total-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderMonthlyTotalRevenueResponse>>> findMonthlyTotalRevenueByMerchant(
             MonthTotalRevenueMerchantRequest req) {
         return ResponseEntity.ok(orderTotalRevenueByMerchantService.findMonthlyStatsByMerchant(req));
     }
 
     @GetMapping("/merchant/yearly-total-revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<OrderYearlyTotalRevenueResponse>>> findYearlyTotalRevenueByMerchant(
             YearTotalRevenueMerchantRequest req) {
         return ResponseEntity.ok(orderTotalRevenueByMerchantService.findYearlyStatsByMerchant(req));
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponse>> create(@Valid @RequestBody CreateOrderRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderCommandService.create(req));
     }
 
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponse>> update(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateOrderRequest req) {
@@ -148,26 +164,31 @@ public class OrderController {
     }
 
     @PostMapping("/trashed/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponseDeleteAt>> trashedOrder(@PathVariable Integer id) {
         return ResponseEntity.ok(orderCommandService.trash(id));
     }
 
     @PostMapping("/restore/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<OrderResponseDeleteAt>> restoreOrder(@PathVariable Integer id) {
         return ResponseEntity.ok(orderCommandService.restore(id));
     }
 
     @DeleteMapping("/permanent/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteOrderPermanent(@PathVariable Integer id) {
         return ResponseEntity.ok(orderCommandService.delete(id));
     }
 
     @PostMapping("/restore/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> restoreAllOrders() {
         return ResponseEntity.ok(orderCommandService.restoreAll());
     }
 
     @PostMapping("/permanent/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteAllOrdersPermanent() {
         return ResponseEntity.ok(orderCommandService.deleteAll());
     }

@@ -8,10 +8,10 @@ import lombok.Data;
 @Schema(name = "YearTotalSalesMerchant", description = "Total penjualan tahunan per merchant")
 public class YearTotalSalesMerchant {
     @NotNull
-    @Schema(description = "ID merchant", required = true, example = "123")
+    @Schema(description = "ID merchant", example = "123")
     private Integer merchantId;
 
     @NotNull
-    @Schema(description = "Tahun", required = true, example = "2025")
+    @Schema(description = "Tahun", example = "2025")
     private Integer year;
 }

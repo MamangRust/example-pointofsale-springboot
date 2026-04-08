@@ -9,10 +9,10 @@ import lombok.Data;
 public class MonthCashierIdRequest {
 
     @NotNull(message = "cashier_id is required")
-    @Schema(description = "ID kasir", example = "101", required = true)
+    @Schema(description = "ID kasir", example = "101")
     private Integer cashierId;
 
     @NotNull(message = "year is required")
-    @Schema(description = "Tahun laporan", example = "2025", required = true)
+    @Schema(description = "Tahun laporan", example = "2025")
     private Integer year;
 }

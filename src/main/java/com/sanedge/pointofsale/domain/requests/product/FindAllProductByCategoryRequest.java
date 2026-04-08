@@ -11,7 +11,7 @@ import lombok.Data;
 public class FindAllProductByCategoryRequest {
 
     @NotNull
-    @Parameter(description = "Nama kategori produk", example = "Minuman", required = true)
+    @Parameter(description = "Nama kategori produk", example = "Minuman")
     private String categoryName;
 
     @Parameter(description = "Kata kunci pencarian (nullable)", example = "kopi")
@@ -27,11 +27,11 @@ public class FindAllProductByCategoryRequest {
 
     @NotNull
     @Min(1)
-    @Parameter(description = "Nomor halaman (mulai dari 1)", example = "1", required = true)
+    @Parameter(description = "Nomor halaman (mulai dari 1)", example = "1")
     private Integer page;
 
     @NotNull
     @Min(1)
-    @Parameter(description = "Jumlah data per halaman", example = "10", required = true)
+    @Parameter(description = "Jumlah data per halaman", example = "10")
     private Integer pageSize;
 }

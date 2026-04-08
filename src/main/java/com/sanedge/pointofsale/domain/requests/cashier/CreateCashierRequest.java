@@ -9,14 +9,14 @@ import lombok.Data;
 @Schema(name = "CreateCashierRequest", description = "Request untuk membuat cashier baru")
 public class CreateCashierRequest {
     @NotNull
-    @Schema(description = "ID merchant", required = true, example = "123")
+    @Schema(description = "ID merchant", example = "123")
     private Integer merchantId;
 
     @NotNull
-    @Schema(description = "ID user", required = true, example = "789")
+    @Schema(description = "ID user", example = "789")
     private Integer userId;
 
     @NotBlank
-    @Schema(description = "Nama cashier", required = true, example = "John Doe")
+    @Schema(description = "Nama cashier", example = "John Doe")
     private String name;
 }

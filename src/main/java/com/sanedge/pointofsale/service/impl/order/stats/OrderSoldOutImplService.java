@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class OrderSoldOutImplService implements OrderSoldoutService {
 
-    private OrderSoldOutRepository orderSoldOutRepository;
+    private final OrderSoldOutRepository orderSoldOutRepository;
 
     @Override
     public ApiResponse<List<OrderMonthlyResponse>> findMonthlyOrders(Integer yearMonth) {

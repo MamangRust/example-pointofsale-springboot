@@ -28,11 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class TransactionCommandImplService implements TransactionCommandService {
-    private MerchantQueryRepository merchantQueryRepository;
-    private TransactionQueryRepository transactionQueryRepository;
-    private OrderQueryRepository orderQueryRepository;
-    private OrderItemRepository orderItemRepository;
-    private TransactionCommandRepository transactionCommandRepository;
+    private final MerchantQueryRepository merchantQueryRepository;
+    private final TransactionQueryRepository transactionQueryRepository;
+    private final OrderQueryRepository orderQueryRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final TransactionCommandRepository transactionCommandRepository;
 
     @Override
     public ApiResponse<TransactionResponse> create(CreateTransactionRequest req) {

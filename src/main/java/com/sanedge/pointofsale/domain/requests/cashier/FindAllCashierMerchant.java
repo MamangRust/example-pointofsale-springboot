@@ -12,11 +12,11 @@ import lombok.Data;
 @Schema(name = "FindAllCashierMerchant", description = "Request untuk mencari cashier per merchant")
 public class FindAllCashierMerchant {
     @NotNull(message = "merchant_id is required")
-    @Parameter(description = "ID merchant", required = true, example = "123")
+    @Parameter(description = "ID merchant", example = "123")
     private Integer merchantId;
 
     @NotBlank(message = "search is required")
-    @Parameter(description = "Kata kunci pencarian", required = true, example = "Cashier A")
+    @Parameter(description = "Kata kunci pencarian", example = "Cashier A")
     private String search;
 
     @Min(1)

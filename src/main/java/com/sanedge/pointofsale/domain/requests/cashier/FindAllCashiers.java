@@ -11,7 +11,7 @@ import lombok.Data;
 @Schema(name = "FindAllCashiers", description = "Request untuk mencari semua cashier")
 public class FindAllCashiers {
     @NotBlank(message = "search is required")
-    @Parameter(description = "Kata kunci pencarian", required = true, example = "John")
+    @Parameter(description = "Kata kunci pencarian", example = "John")
     private String search;
 
     @Min(value = 1, message = "page harus minimal 1")

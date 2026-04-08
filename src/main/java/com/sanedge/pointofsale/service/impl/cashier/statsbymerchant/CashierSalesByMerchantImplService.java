@@ -22,94 +22,97 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class CashierSalesByMerchantImplService implements CashierSalesByMerchantService {
-    private final CashierSalesByMerchantRepository cashierSalesByMerchantRepository;
+        private final CashierSalesByMerchantRepository cashierSalesByMerchantRepository;
 
-    @Override
-    public ApiResponse<List<CashierResponseMonthSales>> findMonthlyCashierByMerchant(MonthCashierMerchantRequest req) {
-        log.info("📊 Fetching monthly cashier sales by merchant | MerchantID: {}, Year: {}",
-                req.getMerchantId(), req.getYear());
+        @Override
+        public ApiResponse<List<CashierResponseMonthSales>> findMonthlyCashierByMerchant(
+                        MonthCashierMerchantRequest req) {
+                log.info("📊 Fetching monthly cashier sales by merchant | MerchantID: {}, Year: {}",
+                                req.getMerchantId(), req.getYear());
 
-        if (req.getMerchantId() == null || req.getYear() == null) {
-            log.error("❌ MerchantId or Year is null | req: {}", req);
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("error")
-                    .message("MerchantId and Year must not be null")
-                    .data(List.of())
-                    .build();
+                if (req.getMerchantId() == null || req.getYear() == null) {
+                        log.error("❌ MerchantId or Year is null | req: {}", req);
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("error")
+                                        .message("MerchantId and Year must not be null")
+                                        .data(List.of())
+                                        .build();
+                }
+
+                try {
+                        LocalDate startMonth = LocalDate.of(req.getYear(), 1, 1);
+                        LocalDate nextYear = startMonth.plusYears(1);
+
+                        List<CashierMonthSales> results = cashierSalesByMerchantRepository.findMonthSalesByMerchant(
+                                        req.getMerchantId().longValue(),
+                                        req.getYear(),
+                                        startMonth.getMonthValue(),
+                                        nextYear.getMonthValue());
+
+                        List<CashierResponseMonthSales> response = results.stream()
+                                        .map(CashierResponseMonthSales::from)
+                                        .toList();
+
+                        log.info("✅ Found {} monthly cashier sales for merchant {}", response.size(),
+                                        req.getMerchantId());
+
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("success")
+                                        .message("Monthly cashier sales by merchant retrieved successfully")
+                                        .data(response)
+                                        .build();
+
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch monthly cashier sales by merchant | MerchantID: {}, Year: {}",
+                                        req.getMerchantId(), req.getYear(), e);
+                        return ApiResponse.<List<CashierResponseMonthSales>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch monthly cashier sales by merchant")
+                                        .data(List.of())
+                                        .build();
+                }
         }
 
-        try {
-            LocalDate startMonth = LocalDate.of(req.getYear(), 1, 1);
-            LocalDate nextYear = startMonth.plusYears(1);
+        @Override
+        public ApiResponse<List<CashierResponseYearSales>> findYearlyCashierByMerchant(YearCashierMerchantRequest req) {
+                log.info("📊 Fetching yearly cashier sales by merchant | MerchantID: {}, Year: {}",
+                                req.getMerchantId(), req.getYear());
 
-            List<CashierMonthSales> results = cashierSalesByMerchantRepository.findMonthSalesByMerchant(
-                    req.getMerchantId().longValue(),
-                    req.getYear(),
-                    startMonth.getMonthValue(),
-                    nextYear.getMonthValue());
+                if (req.getMerchantId() == null || req.getYear() == null) {
+                        log.error("❌ MerchantId or Year is null | req: {}", req);
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("error")
+                                        .message("MerchantId and Year must not be null")
+                                        .data(List.of())
+                                        .build();
+                }
 
-            List<CashierResponseMonthSales> response = results.stream()
-                    .map(CashierResponseMonthSales::from)
-                    .toList();
+                try {
+                        List<CashierYearSales> results = cashierSalesByMerchantRepository.findYearSalesByMerchant(
+                                        req.getMerchantId().longValue(),
+                                        req.getYear());
 
-            log.info("✅ Found {} monthly cashier sales for merchant {}", response.size(), req.getMerchantId());
+                        List<CashierResponseYearSales> response = results.stream()
+                                        .map(CashierResponseYearSales::from)
+                                        .toList();
 
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("success")
-                    .message("Monthly cashier sales by merchant retrieved successfully")
-                    .data(response)
-                    .build();
+                        log.info("✅ Found {} yearly cashier sales for merchant {}", response.size(),
+                                        req.getMerchantId());
 
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch monthly cashier sales by merchant | MerchantID: {}, Year: {}",
-                    req.getMerchantId(), req.getYear(), e);
-            return ApiResponse.<List<CashierResponseMonthSales>>builder()
-                    .status("error")
-                    .message("Failed to fetch monthly cashier sales by merchant")
-                    .data(List.of())
-                    .build();
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("success")
+                                        .message("Yearly cashier sales by merchant retrieved successfully")
+                                        .data(response)
+                                        .build();
+
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch yearly cashier sales by merchant | MerchantID: {}, Year: {}",
+                                        req.getMerchantId(), req.getYear(), e);
+                        return ApiResponse.<List<CashierResponseYearSales>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch yearly cashier sales by merchant")
+                                        .data(List.of())
+                                        .build();
+                }
         }
-    }
-
-    @Override
-    public ApiResponse<List<CashierResponseYearSales>> findYearlyCashierByMerchant(YearCashierMerchantRequest req) {
-        log.info("📊 Fetching yearly cashier sales by merchant | MerchantID: {}, Year: {}",
-                req.getMerchantId(), req.getYear());
-
-        if (req.getMerchantId() == null || req.getYear() == null) {
-            log.error("❌ MerchantId or Year is null | req: {}", req);
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("error")
-                    .message("MerchantId and Year must not be null")
-                    .data(List.of())
-                    .build();
-        }
-
-        try {
-            List<CashierYearSales> results = cashierSalesByMerchantRepository.findYearSalesByMerchant(
-                    req.getMerchantId().longValue(),
-                    req.getYear());
-
-            List<CashierResponseYearSales> response = results.stream()
-                    .map(CashierResponseYearSales::from)
-                    .toList();
-
-            log.info("✅ Found {} yearly cashier sales for merchant {}", response.size(), req.getMerchantId());
-
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("success")
-                    .message("Yearly cashier sales by merchant retrieved successfully")
-                    .data(response)
-                    .build();
-
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch yearly cashier sales by merchant | MerchantID: {}, Year: {}",
-                    req.getMerchantId(), req.getYear(), e);
-            return ApiResponse.<List<CashierResponseYearSales>>builder()
-                    .status("error")
-                    .message("Failed to fetch yearly cashier sales by merchant")
-                    .data(List.of())
-                    .build();
-        }
-    }
 }

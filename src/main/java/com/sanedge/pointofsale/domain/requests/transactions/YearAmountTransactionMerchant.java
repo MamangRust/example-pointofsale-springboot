@@ -9,10 +9,10 @@ import lombok.Data;
 public class YearAmountTransactionMerchant {
 
     @NotNull
-    @Schema(description = "ID merchant", example = "123", required = true)
+    @Schema(description = "ID merchant", example = "123")
     private Integer merchantId;
 
     @NotNull
-    @Schema(description = "Tahun transaksi", example = "2025", required = true)
+    @Schema(description = "Tahun transaksi", example = "2025")
     private Integer year;
 }

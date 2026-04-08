@@ -26,186 +26,186 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class OrderQueryImplService implements OrderQueryService {
-    private final OrderQueryRepository orderQueryRepository;
+        private final OrderQueryRepository orderQueryRepository;
 
-    @Override
-    public ApiResponsePagination<List<OrderResponse>> findAll(FindAllOrderRequest req) {
-        int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
-        int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
-        String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
+        @Override
+        public ApiResponsePagination<List<OrderResponse>> findAll(FindAllOrderRequest req) {
+                int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
+                int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
+                String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
 
-        log.info("🔍 Searching all orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
-                keyword.isEmpty() ? "None" : keyword);
+                log.info("🔍 Searching all orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
+                                keyword.isEmpty() ? "None" : keyword);
 
-        try {
-            Pageable pageable = PageRequest.of(page, pageSize);
-            Page<Order> orderPage = orderQueryRepository.findOrders(keyword, pageable);
+                try {
+                        Pageable pageable = PageRequest.of(page, pageSize);
+                        Page<Order> orderPage = orderQueryRepository.findOrders(keyword, pageable);
 
-            List<OrderResponse> responses = orderPage.getContent()
-                    .stream()
-                    .map(OrderResponse::from)
-                    .toList();
+                        List<OrderResponse> responses = orderPage.getContent()
+                                        .stream()
+                                        .map(OrderResponse::from)
+                                        .toList();
 
-            log.info("✅ Found {} orders", responses.size());
+                        log.info("✅ Found {} orders", responses.size());
 
-            return ApiResponsePagination.<List<OrderResponse>>builder()
-                    .status("success")
-                    .message("Orders retrieved successfully")
-                    .data(responses)
-                    .pagination(PaginationMeta.fromSpringPage(orderPage))
-                    .build();
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch orders", e);
-            return ApiResponsePagination.<List<OrderResponse>>builder()
-                    .status("error")
-                    .message("Failed to fetch orders")
-                    .data(Collections.emptyList())
-                    .pagination(null)
-                    .build();
+                        return ApiResponsePagination.<List<OrderResponse>>builder()
+                                        .status("success")
+                                        .message("Orders retrieved successfully")
+                                        .data(responses)
+                                        .pagination(PaginationMeta.fromSpringPage(orderPage))
+                                        .build();
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch orders", e);
+                        return ApiResponsePagination.<List<OrderResponse>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch orders")
+                                        .data(Collections.emptyList())
+                                        .pagination(null)
+                                        .build();
+                }
         }
-    }
 
-    @Override
-    public ApiResponsePagination<List<OrderResponseDeleteAt>> findByActive(FindAllOrderRequest req) {
-        int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
-        int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
-        String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
+        @Override
+        public ApiResponsePagination<List<OrderResponseDeleteAt>> findByActive(FindAllOrderRequest req) {
+                int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
+                int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
+                String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
 
-        log.info("🔍 Searching active orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
-                keyword.isEmpty() ? "None" : keyword);
+                log.info("🔍 Searching active orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
+                                keyword.isEmpty() ? "None" : keyword);
 
-        try {
-            Pageable pageable = PageRequest.of(page, pageSize);
-            Page<Order> orderPage = orderQueryRepository.findActiveOrders(keyword, pageable);
+                try {
+                        Pageable pageable = PageRequest.of(page, pageSize);
+                        Page<Order> orderPage = orderQueryRepository.findActiveOrders(keyword, pageable);
 
-            List<OrderResponseDeleteAt> responses = orderPage.getContent()
-                    .stream()
-                    .map(OrderResponseDeleteAt::from)
-                    .toList();
+                        List<OrderResponseDeleteAt> responses = orderPage.getContent()
+                                        .stream()
+                                        .map(OrderResponseDeleteAt::from)
+                                        .toList();
 
-            log.info("✅ Found {} active orders", responses.size());
+                        log.info("✅ Found {} active orders", responses.size());
 
-            return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
-                    .status("success")
-                    .message("Active orders retrieved successfully")
-                    .data(responses)
-                    .pagination(PaginationMeta.fromSpringPage(orderPage))
-                    .build();
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch active orders", e);
-            return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
-                    .status("error")
-                    .message("Failed to fetch active orders")
-                    .data(Collections.emptyList())
-                    .pagination(null)
-                    .build();
+                        return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
+                                        .status("success")
+                                        .message("Active orders retrieved successfully")
+                                        .data(responses)
+                                        .pagination(PaginationMeta.fromSpringPage(orderPage))
+                                        .build();
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch active orders", e);
+                        return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch active orders")
+                                        .data(Collections.emptyList())
+                                        .pagination(null)
+                                        .build();
+                }
         }
-    }
 
-    @Override
-    public ApiResponsePagination<List<OrderResponseDeleteAt>> findByTrashed(FindAllOrderRequest req) {
-        int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
-        int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
-        String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
+        @Override
+        public ApiResponsePagination<List<OrderResponseDeleteAt>> findByTrashed(FindAllOrderRequest req) {
+                int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
+                int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
+                String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
 
-        log.info("🔍 Searching trashed orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
-                keyword.isEmpty() ? "None" : keyword);
+                log.info("🔍 Searching trashed orders | Page: {}, Size: {}, Search: {}", page + 1, pageSize,
+                                keyword.isEmpty() ? "None" : keyword);
 
-        try {
-            Pageable pageable = PageRequest.of(page, pageSize);
-            Page<Order> orderPage = orderQueryRepository.findTrashedOrders(keyword, pageable);
+                try {
+                        Pageable pageable = PageRequest.of(page, pageSize);
+                        Page<Order> orderPage = orderQueryRepository.findTrashedOrders(keyword, pageable);
 
-            List<OrderResponseDeleteAt> responses = orderPage.getContent()
-                    .stream()
-                    .map(OrderResponseDeleteAt::from)
-                    .toList();
+                        List<OrderResponseDeleteAt> responses = orderPage.getContent()
+                                        .stream()
+                                        .map(OrderResponseDeleteAt::from)
+                                        .toList();
 
-            log.info("✅ Found {} trashed orders", responses.size());
+                        log.info("✅ Found {} trashed orders", responses.size());
 
-            return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
-                    .status("success")
-                    .message("Trashed orders retrieved successfully")
-                    .data(responses)
-                    .pagination(PaginationMeta.fromSpringPage(orderPage))
-                    .build();
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch trashed orders", e);
-            return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
-                    .status("error")
-                    .message("Failed to fetch trashed orders")
-                    .data(Collections.emptyList())
-                    .pagination(null)
-                    .build();
+                        return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
+                                        .status("success")
+                                        .message("Trashed orders retrieved successfully")
+                                        .data(responses)
+                                        .pagination(PaginationMeta.fromSpringPage(orderPage))
+                                        .build();
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch trashed orders", e);
+                        return ApiResponsePagination.<List<OrderResponseDeleteAt>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch trashed orders")
+                                        .data(Collections.emptyList())
+                                        .pagination(null)
+                                        .build();
+                }
         }
-    }
 
-    @Override
-    public ApiResponsePagination<List<OrderResponse>> findByMerchantId(FindAllOrderByMerchantRequest req) {
-        int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
-        int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
-        String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
+        @Override
+        public ApiResponsePagination<List<OrderResponse>> findByMerchantId(FindAllOrderByMerchantRequest req) {
+                int page = req.getPage() > 0 ? req.getPage() - 1 : 0;
+                int pageSize = req.getPageSize() > 0 ? req.getPageSize() : 10;
+                String keyword = (req.getSearch() != null && !req.getSearch().isEmpty()) ? req.getSearch() : "";
 
-        log.info("🔍 Searching orders by merchantId={} | Page: {}, Size: {}, Search: {}", req.getMerchantId(),
-                page + 1,
-                pageSize,
-                keyword.isEmpty() ? "None" : keyword);
+                log.info("🔍 Searching orders by merchantId={} | Page: {}, Size: {}, Search: {}", req.getMerchantId(),
+                                page + 1,
+                                pageSize,
+                                keyword.isEmpty() ? "None" : keyword);
 
-        try {
-            Pageable pageable = PageRequest.of(page, pageSize);
-            Page<Order> orderPage = orderQueryRepository.findOrdersByMerchant(
-                    req.getMerchantId().longValue(),
-                    keyword,
-                    pageable);
+                try {
+                        Pageable pageable = PageRequest.of(page, pageSize);
+                        Page<Order> orderPage = orderQueryRepository.findOrdersByMerchant(
+                                        req.getMerchantId().longValue(),
+                                        keyword,
+                                        pageable);
 
-            List<OrderResponse> responses = orderPage.getContent()
-                    .stream()
-                    .map(OrderResponse::from)
-                    .toList();
+                        List<OrderResponse> responses = orderPage.getContent()
+                                        .stream()
+                                        .map(OrderResponse::from)
+                                        .toList();
 
-            log.info("✅ Found {} orders for merchantId={}", responses.size(), req.getMerchantId());
+                        log.info("✅ Found {} orders for merchantId={}", responses.size(), req.getMerchantId());
 
-            return ApiResponsePagination.<List<OrderResponse>>builder()
-                    .status("success")
-                    .message("Orders retrieved successfully")
-                    .data(responses)
-                    .pagination(PaginationMeta.fromSpringPage(orderPage))
-                    .build();
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch orders for merchantId={}", req.getMerchantId(), e);
-            return ApiResponsePagination.<List<OrderResponse>>builder()
-                    .status("error")
-                    .message("Failed to fetch orders for merchant")
-                    .data(Collections.emptyList())
-                    .pagination(null)
-                    .build();
+                        return ApiResponsePagination.<List<OrderResponse>>builder()
+                                        .status("success")
+                                        .message("Orders retrieved successfully")
+                                        .data(responses)
+                                        .pagination(PaginationMeta.fromSpringPage(orderPage))
+                                        .build();
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch orders for merchantId={}", req.getMerchantId(), e);
+                        return ApiResponsePagination.<List<OrderResponse>>builder()
+                                        .status("error")
+                                        .message("Failed to fetch orders for merchant")
+                                        .data(Collections.emptyList())
+                                        .pagination(null)
+                                        .build();
+                }
         }
-    }
 
-    @Override
-    public ApiResponse<OrderResponse> findById(Integer id) {
-        log.info("🔍 Finding order by id={}", id);
-        try {
-            return orderQueryRepository.findOrderById(id.longValue())
-                    .map(order -> ApiResponse.<OrderResponse>builder()
-                            .status("success")
-                            .message("Order retrieved successfully")
-                            .data(OrderResponse.from(order))
-                            .build())
-                    .orElseGet(() -> {
-                        log.warn("❌ Order not found with id={}", id);
+        @Override
+        public ApiResponse<OrderResponse> findById(Integer id) {
+                log.info("🔍 Finding order by id={}", id);
+                try {
+                        return orderQueryRepository.findOrderById(id.longValue())
+                                        .map(order -> ApiResponse.<OrderResponse>builder()
+                                                        .status("success")
+                                                        .message("Order retrieved successfully")
+                                                        .data(OrderResponse.from(order))
+                                                        .build())
+                                        .orElseGet(() -> {
+                                                log.warn("❌ Order not found with id={}", id);
+                                                return ApiResponse.<OrderResponse>builder()
+                                                                .status("error")
+                                                                .message("Order not found")
+                                                                .data(null)
+                                                                .build();
+                                        });
+                } catch (Exception e) {
+                        log.error("💥 Failed to fetch order by id={}", id, e);
                         return ApiResponse.<OrderResponse>builder()
-                                .status("error")
-                                .message("Order not found")
-                                .data(null)
-                                .build();
-                    });
-        } catch (Exception e) {
-            log.error("💥 Failed to fetch order by id={}", id, e);
-            return ApiResponse.<OrderResponse>builder()
-                    .status("error")
-                    .message("Failed to fetch order")
-                    .data(null)
-                    .build();
+                                        .status("error")
+                                        .message("Failed to fetch order")
+                                        .data(null)
+                                        .build();
+                }
         }
-    }
 }

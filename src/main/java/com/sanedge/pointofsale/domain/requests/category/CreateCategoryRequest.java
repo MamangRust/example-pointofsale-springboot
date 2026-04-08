@@ -8,11 +8,11 @@ import lombok.Data;
 @Schema(name = "CreateCategoryRequest", description = "Request untuk membuat kategori")
 public class CreateCategoryRequest {
     @NotBlank
-    @Schema(description = "Nama kategori", required = true, example = "Elektronik")
+    @Schema(description = "Nama kategori", example = "Elektronik")
     private String name;
 
     @NotBlank
-    @Schema(description = "Deskripsi kategori", required = true, example = "Semua produk elektronik")
+    @Schema(description = "Deskripsi kategori", example = "Semua produk elektronik")
     private String description;
 
     @Schema(description = "Slug kategori", example = "elektronik")

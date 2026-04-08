@@ -2,8 +2,8 @@ package com.sanedge.pointofsale.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,18 +23,14 @@ import com.sanedge.pointofsale.domain.responses.user.UserResponseDeleteAt;
 import com.sanedge.pointofsale.service.user.UserCommandService;
 import com.sanedge.pointofsale.service.user.UserQueryService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
-
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
-
-    @Autowired
-    public UserController(UserQueryService userQueryService, UserCommandService userCommandService) {
-        this.userQueryService = userQueryService;
-        this.userCommandService = userCommandService;
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponsePagination<List<UserResponse>>> findAll(
@@ -60,36 +56,43 @@ public class UserController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> create(@RequestBody CreateUserRequest req) {
         return ResponseEntity.ok(userCommandService.create(req));
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> update(@RequestBody UpdateUserRequest req) {
         return ResponseEntity.ok(userCommandService.update(req));
     }
 
     @PostMapping("/trash/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponseDeleteAt>> trash(@PathVariable Integer id) {
         return ResponseEntity.ok(userCommandService.trashed(id));
     }
 
     @PostMapping("/restore/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserResponseDeleteAt>> restore(@PathVariable Integer id) {
         return ResponseEntity.ok(userCommandService.restore(id));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deletePermanent(@PathVariable Integer id) {
         return ResponseEntity.ok(userCommandService.deletePermanent(id));
     }
 
     @PostMapping("/restore-all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> restoreAll() {
         return ResponseEntity.ok(userCommandService.restoreAll());
     }
 
     @PostMapping("/delete-all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteAll() {
         return ResponseEntity.ok(userCommandService.deleteAll());
     }

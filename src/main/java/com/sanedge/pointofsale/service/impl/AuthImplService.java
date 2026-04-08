@@ -1,13 +1,12 @@
 package com.sanedge.pointofsale.service.impl;
 
-import java.util.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,40 +32,22 @@ import com.sanedge.pointofsale.security.JwtProvider;
 import com.sanedge.pointofsale.security.UserDetailsImpl;
 import com.sanedge.pointofsale.service.AuthService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class AuthImplService implements AuthService {
 
-        private AuthenticationManager authenticationManager;
-        private UserQueryRepository userQueryRepository;
-        private UserCommandRepository userCommandRepository;
-        private JwtProvider jwtProvider;
-        private PasswordEncoder passwordEncoder;
-        private RefreshTokenQueryRepository refreshTokenQueryRepository;
-        private RefreshTokenCommandRepository refreshTokenCommandRepository;
-        private RoleQueryRepository roleQueryRepository;
-
-        @Autowired
-        public AuthImplService(
-                        AuthenticationManager authenticationManager,
-                        UserQueryRepository userQueryRepository,
-                        UserCommandRepository userCommandRepository,
-                        JwtProvider jwtProvider,
-                        PasswordEncoder passwordEncoder,
-                        RefreshTokenQueryRepository refreshTokenQueryRepository,
-                        RefreshTokenCommandRepository refreshTokenCommandRepository,
-                        RoleQueryRepository roleQueryRepository) {
-                this.authenticationManager = authenticationManager;
-                this.userQueryRepository = userQueryRepository;
-                this.userCommandRepository = userCommandRepository;
-                this.jwtProvider = jwtProvider;
-                this.passwordEncoder = passwordEncoder;
-                this.refreshTokenQueryRepository = refreshTokenQueryRepository;
-                this.refreshTokenCommandRepository = refreshTokenCommandRepository;
-                this.roleQueryRepository = roleQueryRepository;
-        }
+        private final AuthenticationManager authenticationManager;
+        private final UserQueryRepository userQueryRepository;
+        private final UserCommandRepository userCommandRepository;
+        private final JwtProvider jwtProvider;
+        private final PasswordEncoder passwordEncoder;
+        private final RefreshTokenQueryRepository refreshTokenQueryRepository;
+        private final RefreshTokenCommandRepository refreshTokenCommandRepository;
+        private final RoleQueryRepository roleQueryRepository;
 
         @Override
         public ApiResponse<TokenResponse> login(AuthRequest loginRequest) {

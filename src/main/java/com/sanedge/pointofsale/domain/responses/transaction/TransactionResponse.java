@@ -1,5 +1,6 @@
 package com.sanedge.pointofsale.domain.responses.transaction;
 
+
 import com.sanedge.pointofsale.models.transaction.Transaction;
 
 import lombok.AllArgsConstructor;

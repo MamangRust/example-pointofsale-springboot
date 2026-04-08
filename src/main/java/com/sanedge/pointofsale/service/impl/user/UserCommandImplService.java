@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,33 +26,19 @@ import com.sanedge.pointofsale.service.user.UserCommandService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UserCommandImplService implements UserCommandService {
-    private UserQueryRepository userQueryRepository;
-    private RoleQueryRepository roleQueryRepository;
-    private UserRoleRepository userRoleRepository;
-    private UserCommandRepository userCommandRepository;
-    private PasswordEncoder passwordEncoder;
-    private Validator validator;
-
-    @Autowired
-    public UserCommandImplService(
-            Validator validator,
-            RoleQueryRepository roleQueryRepository,
-            UserQueryRepository userQueryRepository,
-            UserCommandRepository userCommandRepository,
-            PasswordEncoder passwordEncoder,
-            UserRoleRepository userRoleRepository) {
-        this.roleQueryRepository = roleQueryRepository;
-        this.userQueryRepository = userQueryRepository;
-        this.userCommandRepository = userCommandRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.validator = validator;
-        this.userRoleRepository = userRoleRepository;
-    }
+    private final UserQueryRepository userQueryRepository;
+    private final RoleQueryRepository roleQueryRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final UserCommandRepository userCommandRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final Validator validator;
 
     @Override
     public ApiResponse<UserResponse> create(CreateUserRequest req) {

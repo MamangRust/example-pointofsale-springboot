@@ -11,7 +11,7 @@ import lombok.Data;
 public class FindAllOrderByMerchantRequest {
 
     @NotNull
-    @Parameter(description = "ID merchant", example = "123", required = true)
+    @Parameter(description = "ID merchant", example = "123")
     private Integer merchantId;
 
     @Parameter(description = "Kata kunci pencarian", example = "produk")

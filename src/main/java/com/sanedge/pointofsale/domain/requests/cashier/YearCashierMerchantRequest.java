@@ -9,10 +9,10 @@ import lombok.Data;
 public class YearCashierMerchantRequest {
 
     @NotNull(message = "merchant_id is required")
-    @Schema(description = "ID merchant", example = "5001", required = true)
+    @Schema(description = "ID merchant", example = "5001")
     private Integer merchantId;
 
     @NotNull(message = "year is required")
-    @Schema(description = "Tahun laporan", example = "2025", required = true)
+    @Schema(description = "Tahun laporan", example = "2025")
     private Integer year;
 }

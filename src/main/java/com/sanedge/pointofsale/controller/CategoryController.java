@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -157,6 +158,7 @@ public class CategoryController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @ModelAttribute CreateCategoryRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -164,6 +166,7 @@ public class CategoryController {
     }
 
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Integer id,
             @Valid @ModelAttribute UpdateCategoryRequest req) {
@@ -172,26 +175,31 @@ public class CategoryController {
     }
 
     @PostMapping("/trashed/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponseDeleteAt>> trashedCategory(@PathVariable Integer id) {
         return ResponseEntity.ok(categoryCommandService.trashedCategory(id));
     }
 
     @PostMapping("/restore/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponseDeleteAt>> restoreCategory(@PathVariable Integer id) {
         return ResponseEntity.ok(categoryCommandService.restoreCategory(id));
     }
 
     @DeleteMapping("/permanent/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteCategoryPermanent(@PathVariable Integer id) {
         return ResponseEntity.ok(categoryCommandService.deleteCategoryPermanent(id));
     }
 
     @PostMapping("/restore/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> restoreAllCategories() {
         return ResponseEntity.ok(categoryCommandService.restoreAllCategories());
     }
 
     @PostMapping("/permanent/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteAllCategoriesPermanent() {
         return ResponseEntity.ok(categoryCommandService.deleteAllCategoriesPermanent());
     }

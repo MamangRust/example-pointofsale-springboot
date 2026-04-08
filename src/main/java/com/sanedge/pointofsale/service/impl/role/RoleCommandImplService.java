@@ -21,24 +21,17 @@ import com.sanedge.pointofsale.service.role.RoleCommandService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class RoleCommandImplService implements RoleCommandService {
 
-    private RoleQueryRepository roleQueryRepository;
-    private RoleCommandRepository roleCommandRepository;
-    private Validator validator;
-
-    @Autowired
-    public RoleCommandImplService(RoleQueryRepository roleQueryRepository,
-            RoleCommandRepository roleCommandRepository,
-            Validator validator) {
-        this.roleQueryRepository = roleQueryRepository;
-        this.roleCommandRepository = roleCommandRepository;
-        this.validator = validator;
-    }
+    private final RoleQueryRepository roleQueryRepository;
+    private final RoleCommandRepository roleCommandRepository;
+    private final Validator validator;
 
     @Override
     public ApiResponse<RoleResponse> create(CreateRoleRequest request) {

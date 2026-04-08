@@ -1,6 +1,5 @@
 package com.sanedge.pointofsale.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +16,14 @@ import com.sanedge.pointofsale.domain.responses.auth.TokenResponse;
 import com.sanedge.pointofsale.domain.responses.user.UserResponse;
 import com.sanedge.pointofsale.service.AuthService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
-
-    @Autowired
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(@RequestBody RegisterRequest req) {

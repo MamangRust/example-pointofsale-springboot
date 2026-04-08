@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,6 +57,7 @@ public class TransactionController {
     private final TransactionMethodByMerchantService transactionMethodByMerchantService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<TransactionResponse>>> findAllTransactions(
             @ModelAttribute FindAllTransactionRequest req) {
 
@@ -63,6 +65,7 @@ public class TransactionController {
     }
 
     @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<TransactionResponseDeleteAt>>> findActiveTransactions(
             @ModelAttribute FindAllTransactionRequest req) {
 
@@ -70,17 +73,20 @@ public class TransactionController {
     }
 
     @GetMapping("/trashed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<TransactionResponseDeleteAt>>> findTrashedTransactions(
             @ModelAttribute FindAllTransactionRequest req) {
         return ResponseEntity.ok(transactionQueryService.findByTrashed(req));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<TransactionResponse>> findTransactionById(@PathVariable Integer id) {
         return ResponseEntity.ok(transactionQueryService.findById(id));
     }
 
     @GetMapping("/merchant/{merchantId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponsePagination<List<TransactionResponse>>> findByMerchant(
             @PathVariable Integer merchantId,
             @ModelAttribute FindAllTransactionByMerchantRequest req) {
@@ -89,102 +95,119 @@ public class TransactionController {
     }
 
     @GetMapping("/monthly-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyAmountSuccessResponse>>> getMonthlyAmountSuccess(
             @ModelAttribute MonthAmountTransactionRequest req) {
         return ResponseEntity.ok(transactionAmountService.findMonthlyAmountSuccess(req));
     }
 
     @GetMapping("/yearly-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyAmountSuccessResponse>>> getYearlyAmountSuccess(
             @RequestParam Integer year) {
         return ResponseEntity.ok(transactionAmountService.findYearlyAmountSuccess(year));
     }
 
     @GetMapping("/monthly-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyAmountFailedResponse>>> getMonthlyAmountFailed(
             @ModelAttribute MonthAmountTransactionRequest req) {
         return ResponseEntity.ok(transactionAmountService.findMonthlyAmountFailed(req));
     }
 
     @GetMapping("/yearly-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyAmountFailedResponse>>> getYearlyAmountFailed(
             @RequestParam Integer year) {
         return ResponseEntity.ok(transactionAmountService.findYearlyAmountFailed(year));
     }
 
     @GetMapping("/merchant/monthly-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyAmountSuccessResponse>>> getMonthlyAmountSuccessByMerchant(
             @ModelAttribute MonthAmountTransactionMerchant req) {
         return ResponseEntity.ok(transactionAmountByMerchantService.findMonthlyAmountSuccessByMerchant(req));
     }
 
     @GetMapping("/merchant/yearly-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyAmountSuccessResponse>>> getYearlyAmountSuccessByMerchant(
             @ModelAttribute YearAmountTransactionMerchant req) {
         return ResponseEntity.ok(transactionAmountByMerchantService.findYearlyAmountSuccessByMerchant(req));
     }
 
     @GetMapping("/merchant/monthly-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyAmountFailedResponse>>> getMonthlyAmountFailedByMerchant(
             @ModelAttribute MonthAmountTransactionMerchant req) {
         return ResponseEntity.ok(transactionAmountByMerchantService.findMonthlyAmountFailedByMerchant(req));
     }
 
     @GetMapping("/merchant/yearly-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyAmountFailedResponse>>> getYearlyAmountFailedByMerchant(
             @ModelAttribute YearAmountTransactionMerchant req) {
         return ResponseEntity.ok(transactionAmountByMerchantService.findYearlyAmountFailedByMerchant(req));
     }
 
     @GetMapping("/monthly-method-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyMethodResponse>>> getMonthlyMethodSuccess(
             @ModelAttribute MonthMethodTransactionRequest req) {
         return ResponseEntity.ok(transactionMethodService.findMonthlyMethodSuccess(req));
     }
 
     @GetMapping("/yearly-method-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyMethodResponse>>> getYearlyMethodSuccess(
             @RequestParam Integer year) {
         return ResponseEntity.ok(transactionMethodService.findYearlyMethodSuccess(year));
     }
 
     @GetMapping("/monthly-method-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyMethodResponse>>> getMonthlyMethodFailed(
             @ModelAttribute MonthMethodTransactionRequest req) {
         return ResponseEntity.ok(transactionMethodService.findMonthlyMethodFailed(req));
     }
 
     @GetMapping("/yearly-method-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyMethodResponse>>> getYearlyMethodFailed(
             @RequestParam Integer year) {
         return ResponseEntity.ok(transactionMethodService.findYearlyMethodFailed(year));
     }
 
     @GetMapping("/merchant/monthly-method-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyMethodResponse>>> getMonthlyMethodByMerchantSuccess(
             @ModelAttribute MonthMethodTransactionMerchantRequest req) {
         return ResponseEntity.ok(transactionMethodByMerchantService.findMonthlyMethodByMerchantSuccess(req));
     }
 
     @GetMapping("/merchant/yearly-method-success")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyMethodResponse>>> getYearlyMethodByMerchantSuccess(
             @ModelAttribute YearMethodTransactionMerchantRequest req) {
         return ResponseEntity.ok(transactionMethodByMerchantService.findYearlyMethodByMerchantSuccess(req));
     }
 
     @GetMapping("/merchant/monthly-method-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionMonthlyMethodResponse>>> getMonthlyMethodByMerchantFailed(
             @ModelAttribute MonthMethodTransactionMerchantRequest req) {
         return ResponseEntity.ok(transactionMethodByMerchantService.findMonthlyMethodByMerchantFailed(req));
     }
 
     @GetMapping("/merchant/yearly-method-failed")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiResponse<List<TransactionYearlyMethodResponse>>> getYearlyMethodByMerchantFailed(
             @ModelAttribute YearMethodTransactionMerchantRequest req) {
         return ResponseEntity.ok(transactionMethodByMerchantService.findYearlyMethodByMerchantFailed(req));
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<TransactionResponse>> createTransaction(
             @Valid @RequestBody CreateTransactionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -192,6 +215,7 @@ public class TransactionController {
     }
 
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<TransactionResponse>> updateTransaction(
             @PathVariable Integer id,
             @Valid @RequestBody UpdateTransactionRequest request) {
@@ -200,26 +224,31 @@ public class TransactionController {
     }
 
     @PostMapping("/trashed/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<TransactionResponseDeleteAt>> trashTransaction(@PathVariable Integer id) {
         return ResponseEntity.ok(transactionCommandService.trash(id));
     }
 
     @PostMapping("/restore/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<TransactionResponseDeleteAt>> restoreTransaction(@PathVariable Integer id) {
         return ResponseEntity.ok(transactionCommandService.restore(id));
     }
 
     @DeleteMapping("/permanent/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteTransaction(@PathVariable Integer id) {
         return ResponseEntity.ok(transactionCommandService.delete(id));
     }
 
     @PostMapping("/restore/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> restoreAllTrashedTransactions() {
         return ResponseEntity.ok(transactionCommandService.restoreAll());
     }
 
     @PostMapping("/permanent/all")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> deleteAllTrashedTransactions() {
         return ResponseEntity.ok(transactionCommandService.deleteAll());
     }

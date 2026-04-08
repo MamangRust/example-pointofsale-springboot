@@ -2,7 +2,6 @@ package com.sanedge.pointofsale.service.impl.user;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,17 +18,14 @@ import com.sanedge.pointofsale.models.User;
 import com.sanedge.pointofsale.repository.user.UserQueryRepository;
 import com.sanedge.pointofsale.service.user.UserQueryService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UserQueryImplService implements UserQueryService {
-        private UserQueryRepository userQueryRepository;
-
-        @Autowired
-        public UserQueryImplService(UserQueryRepository userQueryRepository) {
-                this.userQueryRepository = userQueryRepository;
-        }
+        private final UserQueryRepository userQueryRepository;
 
         @Override
         public ApiResponsePagination<List<UserResponse>> findAll(FindAllUserRequest req) {
