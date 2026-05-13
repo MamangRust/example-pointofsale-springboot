@@ -18,16 +18,16 @@ public interface CategoryPriceByIdRepository extends JpaRepository<Category, Lon
             WITH date_range AS (
                 SELECT
                     date_trunc('month', make_date(:startDate, 1, 1)) AS start_date,
-                    date_trunc('month', make_date(:startDate, 1, 1)) + interval '1 year' - interval '1 day' AS end_date
+                    date_trunc('month', make_date(:startDate, 1, 1)) + INTERVAL '1' YEAR - INTERVAL '1' DAY AS end_date
             ),
             monthly_category_stats AS (
                 SELECT
-                    c.category_id AS categoryId,
+                    CAST(c.category_id AS INTEGER) AS categoryId,
                     c.name AS categoryName,
                     date_trunc('month', o.created_at) AS activityMonth,
-                    COUNT(DISTINCT o.order_id)::INTEGER AS orderCount,
-                    COALESCE(SUM(oi.quantity), 0)::INTEGER AS itemsSold,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalRevenue
+                    CAST(COUNT(DISTINCT o.order_id) AS INTEGER) AS orderCount,
+                    CAST(COALESCE(SUM(oi.quantity), 0) AS INTEGER) AS itemsSold,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalRevenue
                 FROM
                     orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
@@ -63,13 +63,13 @@ public interface CategoryPriceByIdRepository extends JpaRepository<Category, Lon
     @Query(value = """
             WITH last_five_years AS (
                 SELECT
-                    c.category_id AS categoryId,
+                    CAST(c.category_id AS INTEGER) AS categoryId,
                     c.name AS categoryName,
-                    EXTRACT(YEAR FROM o.created_at)::INTEGER AS year,
-                    COUNT(DISTINCT o.order_id)::INTEGER AS orderCount,
-                    COALESCE(SUM(oi.quantity), 0)::INTEGER AS itemsSold,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalRevenue,
-                    COUNT(DISTINCT oi.product_id)::INTEGER AS uniqueProductsSold
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR) AS year,
+                    CAST(COUNT(DISTINCT o.order_id) AS INTEGER) AS orderCount,
+                    CAST(COALESCE(SUM(oi.quantity), 0) AS INTEGER) AS itemsSold,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalRevenue,
+                    CAST(COUNT(DISTINCT oi.product_id) AS INTEGER) AS uniqueProductsSold
                 FROM
                     orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
@@ -84,7 +84,7 @@ public interface CategoryPriceByIdRepository extends JpaRepository<Category, Lon
                     AND EXTRACT(YEAR FROM o.created_at)
                         BETWEEN (:startDate - 4) AND :startDate
                 GROUP BY
-                    c.category_id, c.name, EXTRACT(YEAR FROM o.created_at)
+                    c.category_id, c.name, CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR)
             )
             SELECT
                 year,

@@ -55,4 +55,6 @@ public interface MerchantQueryRepository extends JpaRepository<Merchant, Long> {
             SELECT m FROM Merchant m WHERE m.merchantId = :merchantId and m.deletedAt is NULL
             """)
     Optional<Merchant> findMerchantById(@Param("merchantId") Long merchantId);
+
+    Optional<Merchant> findByUserId(Long userId);
 }

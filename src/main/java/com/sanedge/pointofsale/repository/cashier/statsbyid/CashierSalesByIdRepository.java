@@ -18,8 +18,8 @@ public interface CashierSalesByIdRepository extends JpaRepository<Cashier, Long>
                 SELECT
                     make_date(:year, :startMonth, 1) AS start_date,
                     make_date(:year, :endMonth, 1)
-                        + interval '1 month' * (1 + :endMonth - :startMonth)
-                        - interval '1 day' AS end_date
+                        + INTERVAL '1' MONTH * (1 + :endMonth - :startMonth)
+                        - INTERVAL '1' DAY AS end_date
             ),
             cashier_activity AS (
                 SELECT
@@ -27,7 +27,7 @@ public interface CashierSalesByIdRepository extends JpaRepository<Cashier, Long>
                     c.name AS cashierName,
                     EXTRACT(MONTH FROM o.created_at) AS activityMonth,
                     COUNT(o.order_id) AS orderCount,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalSales
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalSales
                 FROM orders o
                 JOIN cashiers c ON o.cashier_id = c.cashier_id
                 WHERE o.deleted_at IS NULL
@@ -41,7 +41,7 @@ public interface CashierSalesByIdRepository extends JpaRepository<Cashier, Long>
             SELECT
                 ca.cashierId,
                 ca.cashierName,
-                TO_CHAR(TO_DATE(ca.activityMonth::TEXT, 'MM'), 'Mon') AS month,
+                TO_CHAR(TO_DATE(CAST(ca.activityMonth AS VARCHAR), 'MM'), 'Mon') AS month,
                 ca.orderCount,
                 ca.totalSales
             FROM cashier_activity ca
@@ -58,9 +58,9 @@ public interface CashierSalesByIdRepository extends JpaRepository<Cashier, Long>
                 SELECT
                     c.cashier_id AS cashierId,
                     c.name AS cashierName,
-                    EXTRACT(YEAR FROM o.created_at)::TEXT AS year,
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR) AS year,
                     COUNT(o.order_id) AS orderCount,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalSales
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalSales
                 FROM orders o
                 JOIN cashiers c ON o.cashier_id = c.cashier_id
                 WHERE o.deleted_at IS NULL

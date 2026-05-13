@@ -9,34 +9,36 @@ import org.springframework.stereotype.Repository;
 import com.sanedge.pointofsale.models.User;
 
 import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
 
 @Repository
 public interface UserCommandRepository extends JpaRepository<User, Long> {
-  @Modifying
+
   @Transactional
-  @Query(value = """
-      UPDATE users
-      SET deleted_at = CURRENT_TIMESTAMP
-      WHERE id = :userId
-        AND deleted_at IS NULL
-      RETURNING *
-      """, nativeQuery = true)
-  User trashed(@Param("userId") Long userId);
+  default User trashed(Long userId) {
+      return findById(userId).map(user -> {
+          if (user.getDeletedAt() == null) {
+              user.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+              return save(user);
+          }
+          return user;
+      }).orElse(null);
+  }
+
+  @Transactional
+  default User restore(Long userId) {
+      return findById(userId).map(user -> {
+          if (user.getDeletedAt() != null) {
+              user.setDeletedAt(null);
+              return save(user);
+          }
+          return user;
+      }).orElse(null);
+  }
 
   @Modifying
   @Transactional
-  @Query(value = """
-      UPDATE users
-      SET deleted_at = NULL
-      WHERE id = :userId
-        AND deleted_at IS NOT NULL
-      RETURNING *
-      """, nativeQuery = true)
-  User restore(@Param("userId") Long userId);
-
-  @Modifying
-  @Transactional
-  @Query("DELETE FROM User u WHERE u.id = :userId AND u.deletedAt IS NOT NULL")
+  @Query("DELETE FROM User u WHERE u.userId = :userId AND u.deletedAt IS NOT NULL")
   int deletePermanent(@Param("userId") Long userId);
 
   @Modifying

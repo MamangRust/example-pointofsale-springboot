@@ -18,32 +18,32 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
     @Query(value = """
             WITH monthly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM t.created_at)::integer AS year,
-                    EXTRACT(MONTH FROM t.created_at)::integer AS month,
+                    CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER) AS year,
+                    CAST(EXTRACT(MONTH FROM t.created_at) AS INTEGER) AS month,
                     COUNT(*) AS total_success,
-                    COALESCE(SUM(t.amount), 0)::BIGINT AS total_amount
+                    CAST(COALESCE(SUM(t.amount), 0) AS BIGINT) AS total_amount
                 FROM transactions t
                 WHERE
                     t.deleted_at IS NULL
                     AND t.status = 'SUCCESS'
                     AND (
                         (t.created_at >= make_date(:year, :month, 1)
-                         AND t.created_at < (make_date(:year, :month, 1) + interval '1 month'))
+                         AND t.created_at < (make_date(:year, :month, 1) + INTERVAL '1' MONTH))
                         OR
                         (t.created_at >= make_date(:prevYear, :prevMonth, 1)
-                         AND t.created_at < (make_date(:prevYear, :prevMonth, 1) + interval '1 month'))
+                         AND t.created_at < (make_date(:prevYear, :prevMonth, 1) + INTERVAL '1' MONTH))
                     )
-                GROUP BY EXTRACT(YEAR FROM t.created_at), EXTRACT(MONTH FROM t.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER), CAST(EXTRACT(MONTH FROM t.created_at) AS INTEGER)
             ),
             formatted_data AS (
                 SELECT
-                    year::text AS year,
-                    TO_CHAR(TO_DATE(month::text, 'MM'), 'Mon') AS month,
-                    total_success::int AS totalSuccess,
-                    total_amount::bigint AS totalAmount
+                    CAST(year AS VARCHAR) AS year,
+                    TO_CHAR(TO_DATE(CAST(month AS VARCHAR), 'MM'), 'Mon') AS month,
+                    CAST(total_success AS INTEGER) AS totalSuccess,
+                    CAST(total_amount AS BIGINT) AS totalAmount
                 FROM monthly_data
                 UNION ALL
-                SELECT :year::text,
+                SELECT CAST(:year AS VARCHAR),
                        TO_CHAR(make_date(:year, :month, 1), 'Mon'),
                        0, 0
                 WHERE NOT EXISTS (
@@ -51,7 +51,7 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
                     WHERE year = :year AND month = :month
                 )
                 UNION ALL
-                SELECT :prevYear::text,
+                SELECT CAST(:prevYear AS VARCHAR),
                        TO_CHAR(make_date(:prevYear, :prevMonth, 1), 'Mon'),
                        0, 0
                 WHERE NOT EXISTS (
@@ -71,27 +71,27 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
     @Query(value = """
             WITH yearly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM t.created_at)::integer AS year,
+                    CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER) AS year,
                     COUNT(*) AS total_success,
-                    COALESCE(SUM(t.amount), 0)::BIGINT AS total_amount
+                    CAST(COALESCE(SUM(t.amount), 0) AS BIGINT) AS total_amount
                 FROM transactions t
                 WHERE
                     t.deleted_at IS NULL
                     AND t.status = 'SUCCESS'
                     AND (EXTRACT(YEAR FROM t.created_at) = :year
                          OR EXTRACT(YEAR FROM t.created_at) = :year - 1)
-                GROUP BY EXTRACT(YEAR FROM t.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER)
             ),
             formatted_data AS (
                 SELECT
-                    year::text AS year,
-                    total_success::int AS totalSuccess,
-                    total_amount::bigint AS totalAmount
+                    CAST(year AS VARCHAR) AS year,
+                    CAST(total_success AS INTEGER) AS totalSuccess,
+                    CAST(total_amount AS BIGINT) AS totalAmount
                 FROM yearly_data
                 UNION ALL
-                SELECT :year::text, 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year)
+                SELECT CAST(:year AS VARCHAR), 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year)
                 UNION ALL
-                SELECT (:year - 1)::text, 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year - 1)
+                SELECT CAST((:year - 1) AS VARCHAR), 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year - 1)
             )
             SELECT * FROM formatted_data
             ORDER BY year DESC
@@ -101,32 +101,32 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
     @Query(value = """
             WITH monthly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM t.created_at)::integer AS year,
-                    EXTRACT(MONTH FROM t.created_at)::integer AS month,
+                    CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER) AS year,
+                    CAST(EXTRACT(MONTH FROM t.created_at) AS INTEGER) AS month,
                     COUNT(*) AS total_failed,
-                    COALESCE(SUM(t.amount), 0)::BIGINT AS total_amount
+                    CAST(COALESCE(SUM(t.amount), 0) AS BIGINT) AS total_amount
                 FROM transactions t
                 WHERE
                     t.deleted_at IS NULL
                     AND t.status = 'FAILED'
                     AND (
                         (t.created_at >= make_date(:year, :month, 1)
-                         AND t.created_at < (make_date(:year, :month, 1) + interval '1 month'))
+                         AND t.created_at < (make_date(:year, :month, 1) + INTERVAL '1' MONTH))
                         OR
                         (t.created_at >= make_date(:prevYear, :prevMonth, 1)
-                         AND t.created_at < (make_date(:prevYear, :prevMonth, 1) + interval '1 month'))
+                         AND t.created_at < (make_date(:prevYear, :prevMonth, 1) + INTERVAL '1' MONTH))
                     )
-                GROUP BY EXTRACT(YEAR FROM t.created_at), EXTRACT(MONTH FROM t.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER), CAST(EXTRACT(MONTH FROM t.created_at) AS INTEGER)
             ),
             formatted_data AS (
                 SELECT
-                    year::text AS year,
-                    TO_CHAR(TO_DATE(month::text, 'MM'), 'Mon') AS month,
-                    total_failed::int AS totalFailed,
-                    total_amount::bigint AS totalAmount
+                    CAST(year AS VARCHAR) AS year,
+                    TO_CHAR(TO_DATE(CAST(month AS VARCHAR), 'MM'), 'Mon') AS month,
+                    CAST(total_failed AS INTEGER) AS totalFailed,
+                    CAST(total_amount AS BIGINT) AS totalAmount
                 FROM monthly_data
                 UNION ALL
-                SELECT :year::text,
+                SELECT CAST(:year AS VARCHAR),
                        TO_CHAR(make_date(:year, :month, 1), 'Mon'),
                        0, 0
                 WHERE NOT EXISTS (
@@ -134,7 +134,7 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
                     WHERE year = :year AND month = :month
                 )
                 UNION ALL
-                SELECT :prevYear::text,
+                SELECT CAST(:prevYear AS VARCHAR),
                        TO_CHAR(make_date(:prevYear, :prevMonth, 1), 'Mon'),
                        0, 0
                 WHERE NOT EXISTS (
@@ -154,27 +154,27 @@ public interface TransactionAmountStatusRepository extends JpaRepository<Transac
     @Query(value = """
             WITH yearly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM t.created_at)::integer AS year,
+                    CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER) AS year,
                     COUNT(*) AS total_failed,
-                    COALESCE(SUM(t.amount), 0)::BIGINT AS total_amount
+                    CAST(COALESCE(SUM(t.amount), 0) AS BIGINT) AS total_amount
                 FROM transactions t
                 WHERE
                     t.deleted_at IS NULL
                     AND t.status = 'FAILED'
                     AND (EXTRACT(YEAR FROM t.created_at) = :year
                          OR EXTRACT(YEAR FROM t.created_at) = :year - 1)
-                GROUP BY EXTRACT(YEAR FROM t.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM t.created_at) AS INTEGER)
             ),
             formatted_data AS (
                 SELECT
-                    year::text AS year,
-                    total_failed::int AS totalFailed,
-                    total_amount::bigint AS totalAmount
+                    CAST(year AS VARCHAR) AS year,
+                    CAST(total_failed AS INTEGER) AS totalFailed,
+                    CAST(total_amount AS BIGINT) AS totalAmount
                 FROM yearly_data
                 UNION ALL
-                SELECT :year::text, 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year)
+                SELECT CAST(:year AS VARCHAR), 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year)
                 UNION ALL
-                SELECT (:year - 1)::text, 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year - 1)
+                SELECT CAST((:year - 1) AS VARCHAR), 0, 0 WHERE NOT EXISTS (SELECT 1 FROM yearly_data WHERE year = :year - 1)
             )
             SELECT * FROM formatted_data
             ORDER BY year DESC

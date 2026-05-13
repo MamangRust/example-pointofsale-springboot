@@ -1,5 +1,7 @@
 package com.sanedge.pointofsale.repository.merchant;
 
+import java.sql.Timestamp;
+
 import org.springframework.stereotype.Repository;
 
 import com.sanedge.pointofsale.models.Merchant;
@@ -17,42 +19,39 @@ public class MerchantCommandRepositoryImpl implements MerchantCommandRepositoryC
         @Override
         @Transactional
         public Merchant trashed(Long merchantId) {
-                return (Merchant) em.createNativeQuery(
-                                "UPDATE merchants SET deleted_at = CURRENT_TIMESTAMP " +
-                                                "WHERE merchant_id = :merchantId AND deleted_at IS NULL " +
-                                                "RETURNING *",
-                                Merchant.class)
-                                .setParameter("merchantId", merchantId)
-                                .getSingleResult();
+                Merchant entity = em.find(Merchant.class, merchantId);
+                if (entity != null && entity.getDeletedAt() == null) {
+                        entity.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+                        entity = em.merge(entity);
+                }
+                return entity;
         }
 
         @Override
         @Transactional
         public Merchant restore(Long merchantId) {
-                return (Merchant) em.createNativeQuery(
-                                "UPDATE merchants SET deleted_at = NULL " +
-                                                "WHERE merchant_id = :merchantId AND deleted_at IS NOT NULL " +
-                                                "RETURNING *",
-                                Merchant.class)
-                                .setParameter("merchantId", merchantId)
-                                .getSingleResult();
+                Merchant entity = em.find(Merchant.class, merchantId);
+                if (entity != null && entity.getDeletedAt() != null) {
+                        entity.setDeletedAt(null);
+                        entity = em.merge(entity);
+                }
+                return entity;
         }
 
         @Override
         @Transactional
         public boolean deletePermanent(Long merchantId) {
-                int deleted = em.createNativeQuery(
-                                "DELETE FROM merchants WHERE merchant_id = :merchantId AND deleted_at IS NOT NULL")
-                                .setParameter("merchantId", merchantId)
-                                .executeUpdate();
-                return deleted > 0;
+                Merchant entity = em.find(Merchant.class, merchantId);
+                if (entity != null && entity.getDeletedAt() != null) {
+                        em.remove(entity);
+                }
+                return true;
         }
 
         @Override
         @Transactional
         public boolean restoreAllDeleted() {
-                int updated = em.createNativeQuery(
-                                "UPDATE merchants SET deleted_at = NULL WHERE deleted_at IS NOT NULL")
+                int updated = em.createQuery("UPDATE Merchant e SET e.deletedAt = null WHERE e.deletedAt IS NOT NULL")
                                 .executeUpdate();
                 return updated > 0;
         }
@@ -60,8 +59,7 @@ public class MerchantCommandRepositoryImpl implements MerchantCommandRepositoryC
         @Override
         @Transactional
         public boolean deleteAllDeleted() {
-                int deleted = em.createNativeQuery(
-                                "DELETE FROM merchants WHERE deleted_at IS NOT NULL")
+                int deleted = em.createQuery("DELETE FROM Merchant e WHERE e.deletedAt IS NOT NULL")
                                 .executeUpdate();
                 return deleted > 0;
         }

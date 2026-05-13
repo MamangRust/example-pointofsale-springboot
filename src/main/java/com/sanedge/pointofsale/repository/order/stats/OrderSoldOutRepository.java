@@ -18,14 +18,14 @@ public interface OrderSoldOutRepository extends JpaRepository<Order, Long> {
             WITH date_range AS (
                 SELECT
                     date_trunc('month', TO_TIMESTAMP(:yearMonth, 'YYYYMM')) AS start_date,
-                    date_trunc('month', TO_TIMESTAMP(:yearMonth, 'YYYYMM')) + interval '1 year' - interval '1 day' AS end_date
+                    date_trunc('month', TO_TIMESTAMP(:yearMonth, 'YYYYMM')) + INTERVAL '1' YEAR - INTERVAL '1' DAY AS end_date
             ),
             monthly_orders AS (
                 SELECT
                     date_trunc('month', o.created_at) AS activity_month,
-                    COUNT(o.order_id)::INT AS order_count,
-                    SUM(o.total_price)::BIGINT AS total_revenue,
-                    SUM(oi.quantity)::INT AS total_items_sold
+                    CAST(COUNT(o.order_id) AS INTEGER) AS order_count,
+                    CAST(SUM(o.total_price) AS BIGINT) AS total_revenue,
+                    CAST(SUM(oi.quantity) AS INTEGER) AS total_items_sold
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 WHERE o.deleted_at IS NULL
@@ -47,19 +47,19 @@ public interface OrderSoldOutRepository extends JpaRepository<Order, Long> {
     @Query(value = """
             WITH last_five_years AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::TEXT AS year,
-                    COUNT(o.order_id)::INT AS order_count,
-                    SUM(o.total_price)::BIGINT AS total_revenue,
-                    SUM(oi.quantity)::INT AS total_items_sold,
-                    COUNT(DISTINCT o.user_id)::INT AS active_cashiers,
-                    COUNT(DISTINCT oi.product_id)::INT AS unique_products_sold
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR) AS year,
+                    CAST(COUNT(o.order_id) AS INTEGER) AS order_count,
+                    CAST(SUM(o.total_price) AS BIGINT) AS total_revenue,
+                    CAST(SUM(oi.quantity) AS INTEGER) AS total_items_sold,
+                    CAST(COUNT(DISTINCT o.user_id) AS INTEGER) AS active_cashiers,
+                    CAST(COUNT(DISTINCT oi.product_id) AS INTEGER) AS unique_products_sold
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 WHERE o.deleted_at IS NULL
                   AND oi.deleted_at IS NULL
                   AND EXTRACT(YEAR FROM o.created_at) BETWEEN EXTRACT(YEAR FROM TO_TIMESTAMP(:yearMonth, 'YYYYMM')) - 4
                                                            AND EXTRACT(YEAR FROM TO_TIMESTAMP(:yearMonth, 'YYYYMM'))
-                GROUP BY EXTRACT(YEAR FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR)
             )
             SELECT
                 year,

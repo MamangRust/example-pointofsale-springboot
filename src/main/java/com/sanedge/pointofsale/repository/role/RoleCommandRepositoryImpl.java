@@ -7,54 +7,50 @@ import com.sanedge.pointofsale.models.Role;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
 
 @Repository
 public class RoleCommandRepositoryImpl implements RoleCommandRepositoryCustom {
-        @PersistenceContext
 
+        @PersistenceContext
         private EntityManager em;
 
         @Override
         @Transactional
         public Role trashed(Long roleId) {
-                return (Role) em.createNativeQuery(
-                                "UPDATE roles SET deleted_at = CURRENT_TIMESTAMP " +
-                                                "WHERE role_id = :roleId AND deleted_at IS NULL " +
-                                                "RETURNING *",
-                                Role.class)
-                                .setParameter("roleId", roleId)
-                                .getSingleResult();
+                Role entity = em.find(Role.class, roleId);
+                if (entity != null && entity.getDeletedAt() == null) {
+                        entity.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+                        entity = em.merge(entity);
+                }
+                return entity;
         }
 
         @Override
         @Transactional
         public Role restore(Long roleId) {
-                return (Role) em.createNativeQuery(
-                                "UPDATE roles SET deleted_at = NULL " +
-                                                "WHERE role_id = :roleId AND deleted_at IS NOT NULL " +
-                                                "RETURNING *",
-                                Role.class)
-                                .setParameter("roleId", roleId)
-                                .getSingleResult();
+                Role entity = em.find(Role.class, roleId);
+                if (entity != null && entity.getDeletedAt() != null) {
+                        entity.setDeletedAt(null);
+                        entity = em.merge(entity);
+                }
+                return entity;
         }
 
         @Override
         @Transactional
         public Role deletePermanent(Long roleId) {
-                return (Role) em.createNativeQuery(
-                                "DELETE FROM roles " +
-                                                "WHERE role_id = :roleId AND deleted_at IS NOT NULL " +
-                                                "RETURNING *",
-                                Role.class)
-                                .setParameter("roleId", roleId)
-                                .getSingleResult();
+                Role entity = em.find(Role.class, roleId);
+                if (entity != null && entity.getDeletedAt() != null) {
+                        em.remove(entity);
+                }
+                return entity;
         }
 
         @Override
         @Transactional
         public boolean restoreAllDeleted() {
-                int updated = em.createNativeQuery(
-                                "UPDATE roles SET deleted_at = NULL WHERE deleted_at IS NOT NULL")
+                int updated = em.createQuery("UPDATE Role e SET e.deletedAt = null WHERE e.deletedAt IS NOT NULL")
                                 .executeUpdate();
                 return updated > 0;
         }
@@ -62,10 +58,8 @@ public class RoleCommandRepositoryImpl implements RoleCommandRepositoryCustom {
         @Override
         @Transactional
         public boolean deleteAllDeleted() {
-                int deleted = em.createNativeQuery(
-                                "DELETE FROM roles WHERE deleted_at IS NOT NULL")
+                int deleted = em.createQuery("DELETE FROM Role e WHERE e.deletedAt IS NOT NULL")
                                 .executeUpdate();
                 return deleted > 0;
         }
-
 }

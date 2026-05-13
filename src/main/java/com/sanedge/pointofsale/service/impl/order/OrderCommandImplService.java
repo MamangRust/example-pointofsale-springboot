@@ -64,6 +64,7 @@ public class OrderCommandImplService implements OrderCommandService {
             order.setCashierId(request.getCashierId().longValue());
             order.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
             order.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            order.setTotalPrice(0L);
             order = orderCommandRepository.save(order);
 
             int totalPrice = 0;

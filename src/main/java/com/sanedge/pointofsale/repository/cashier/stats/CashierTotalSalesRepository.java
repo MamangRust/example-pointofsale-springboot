@@ -17,9 +17,9 @@ public interface CashierTotalSalesRepository extends JpaRepository<Cashier, Long
     @Query(value = """
             WITH monthly_totals AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::TEXT AS year,
-                    EXTRACT(MONTH FROM o.created_at)::INTEGER AS month,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS total_sales
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR) AS year,
+                    CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER) AS month,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS total_sales
                 FROM orders o
                 JOIN cashiers c ON o.cashier_id = c.cashier_id
                 WHERE o.deleted_at IS NULL
@@ -28,20 +28,20 @@ public interface CashierTotalSalesRepository extends JpaRepository<Cashier, Long
                       (EXTRACT(YEAR FROM o.created_at) = :startYear AND EXTRACT(MONTH FROM o.created_at) = :startMonth)
                       OR (EXTRACT(YEAR FROM o.created_at) = :endYear AND EXTRACT(MONTH FROM o.created_at) = :endMonth)
                   )
-                GROUP BY EXTRACT(YEAR FROM o.created_at), EXTRACT(MONTH FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR), CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER)
             ),
             all_months AS (
-                SELECT :startYear::TEXT AS year, :startMonth AS month
+                SELECT CAST(:startYear AS VARCHAR) AS year, CAST(:startMonth AS INTEGER) AS month
                 UNION
-                SELECT :endYear::TEXT AS year, :endMonth AS month
+                SELECT CAST(:endYear AS VARCHAR) AS year, CAST(:endMonth AS INTEGER) AS month
             )
             SELECT
                 am.year,
-                TO_CHAR(TO_DATE(am.month::TEXT, 'MM'), 'FMMonth') AS month,
-                COALESCE(mt.total_sales, 0)::BIGINT AS total_sales
+                TO_CHAR(TO_DATE(CAST(am.month AS VARCHAR), 'MM'), 'FMMonth') AS month,
+                CAST(COALESCE(mt.total_sales, 0) AS BIGINT) AS total_sales
             FROM all_months am
             LEFT JOIN monthly_totals mt ON am.year = mt.year AND am.month = mt.month
-            ORDER BY am.year::INT DESC, am.month DESC
+            ORDER BY CAST(am.year AS INTEGER) DESC, am.month DESC
             """, nativeQuery = true)
     List<CashierMonthTotalSales> findMonthTotalSales(
             @Param("startYear") Integer startYear,
@@ -52,23 +52,23 @@ public interface CashierTotalSalesRepository extends JpaRepository<Cashier, Long
     @Query(value = """
             WITH yearly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::INTEGER AS year,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS total_sales
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER) AS year,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS total_sales
                 FROM orders o
                 JOIN cashiers c ON o.cashier_id = c.cashier_id
                 WHERE o.deleted_at IS NULL
                   AND c.deleted_at IS NULL
                   AND EXTRACT(YEAR FROM o.created_at) IN (:year, :yearMinusOne)
-                GROUP BY EXTRACT(YEAR FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER)
             ),
             all_years AS (
-                SELECT :year AS year
+                SELECT CAST(:year AS INTEGER) AS year
                 UNION
-                SELECT :yearMinusOne AS year
+                SELECT CAST(:yearMinusOne AS INTEGER) AS year
             )
             SELECT
-                a.year::TEXT AS year,
-                COALESCE(yd.total_sales, 0)::BIGINT AS total_sales
+                CAST(a.year AS VARCHAR) AS year,
+                CAST(COALESCE(yd.total_sales, 0) AS BIGINT) AS total_sales
             FROM all_years a
             LEFT JOIN yearly_data yd ON a.year = yd.year
             ORDER BY a.year DESC

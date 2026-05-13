@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class RoleQueryImplService implements RoleQueryService {
-        private RoleQueryRepository roleQueryRepository;
+        private final RoleQueryRepository roleQueryRepository;
 
         @Override
         public ApiResponsePagination<List<RoleResponse>> findAll(FindAllRoles req) {

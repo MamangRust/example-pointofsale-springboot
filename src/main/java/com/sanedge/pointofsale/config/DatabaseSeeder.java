@@ -70,10 +70,10 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoles() {
         if (roleQueryRepository.count() == 0) {
             Role adminRole = new Role();
-            adminRole.setRoleName("ADMIN");
+            adminRole.setRoleName("ROLE_ADMIN");
 
             Role userRole = new Role();
-            userRole.setRoleName("USER");
+            userRole.setRoleName("ROLE_USER");
 
             roleCommandRepository.saveAll(Arrays.asList(adminRole, userRole));
             log.info("Roles seeded.");
@@ -82,8 +82,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedUsers() {
         if (userQueryRepository.count() == 0) {
-            Role adminRole = roleQueryRepository.findByRoleName("ADMIN").orElse(null);
-            Role userRole = roleQueryRepository.findByRoleName("USER").orElse(null);
+            Role adminRole = roleQueryRepository.findByRoleName("ROLE_ADMIN").orElse(null);
+            Role userRole = roleQueryRepository.findByRoleName("ROLE_USER").orElse(null);
 
             User admin = new User();
             admin.setUsername("admin");

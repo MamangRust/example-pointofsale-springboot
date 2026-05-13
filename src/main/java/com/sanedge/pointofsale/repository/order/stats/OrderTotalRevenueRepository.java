@@ -16,9 +16,9 @@ public interface OrderTotalRevenueRepository extends JpaRepository<Order, Long> 
     @Query(value = """
             WITH monthly_revenue AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::INT AS year,
-                    EXTRACT(MONTH FROM o.created_at)::INT AS month,
-                    COALESCE(SUM(o.total_price), 0)::INT AS total_revenue
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER) AS year,
+                    CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER) AS month,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS INTEGER) AS total_revenue
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 WHERE o.deleted_at IS NULL
@@ -27,12 +27,12 @@ public interface OrderTotalRevenueRepository extends JpaRepository<Order, Long> 
                       (EXTRACT(YEAR FROM o.created_at) = :year1 AND EXTRACT(MONTH FROM o.created_at) = :month1)
                       OR (EXTRACT(YEAR FROM o.created_at) = :year2 AND EXTRACT(MONTH FROM o.created_at) = :month2)
                   )
-                GROUP BY EXTRACT(YEAR FROM o.created_at), EXTRACT(MONTH FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER), CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER)
             ),
             all_months AS (
-                SELECT :year1::TEXT AS year, :month1 AS month, TO_CHAR(TO_DATE(:month1::TEXT, 'MM'), 'FMMonth') AS month_name
+                SELECT CAST(:year1 AS VARCHAR) AS year, CAST(:month1 AS INTEGER) AS month, TO_CHAR(TO_DATE(CAST(:month1 AS VARCHAR), 'MM'), 'FMMonth') AS month_name
                 UNION
-                SELECT :year2::TEXT AS year, :month2 AS month, TO_CHAR(TO_DATE(:month2::TEXT, 'MM'), 'FMMonth') AS month_name
+                SELECT CAST(:year2 AS VARCHAR) AS year, CAST(:month2 AS INTEGER) AS month, TO_CHAR(TO_DATE(CAST(:month2 AS VARCHAR), 'MM'), 'FMMonth') AS month_name
             )
             SELECT
                 am.year AS year,
@@ -40,7 +40,7 @@ public interface OrderTotalRevenueRepository extends JpaRepository<Order, Long> 
                 COALESCE(mr.total_revenue, 0) AS totalRevenue
             FROM all_months am
             LEFT JOIN monthly_revenue mr
-            ON am.year::INT = mr.year AND am.month = mr.month
+            ON CAST(am.year AS INTEGER) = mr.year AND am.month = mr.month
             ORDER BY am.year DESC, am.month DESC
             """, nativeQuery = true)
     List<OrderMonthTotalRevenue> findMonthlyTotalRevenue(
@@ -52,22 +52,22 @@ public interface OrderTotalRevenueRepository extends JpaRepository<Order, Long> 
     @Query(value = """
             WITH yearly_revenue AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::INT AS year,
-                    COALESCE(SUM(o.total_price), 0)::INT AS total_revenue
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER) AS year,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS INTEGER) AS total_revenue
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 WHERE o.deleted_at IS NULL
                   AND oi.deleted_at IS NULL
                   AND (EXTRACT(YEAR FROM o.created_at) = :year OR EXTRACT(YEAR FROM o.created_at) = :year - 1)
-                GROUP BY EXTRACT(YEAR FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER)
             ),
             all_years AS (
-                SELECT :year AS year
+                SELECT CAST(:year AS INTEGER) AS year
                 UNION
-                SELECT :year - 1 AS year
+                SELECT CAST(:year - 1 AS INTEGER) AS year
             )
             SELECT
-                ay.year::TEXT AS year,
+                CAST(ay.year AS VARCHAR) AS year,
                 COALESCE(yr.total_revenue, 0) AS totalRevenue
             FROM all_years ay
             LEFT JOIN yearly_revenue yr ON ay.year = yr.year

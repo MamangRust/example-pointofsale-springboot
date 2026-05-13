@@ -18,13 +18,13 @@ public interface CategoryTotalPriceByIdRepository extends JpaRepository<Category
             WITH date_range AS (
                 SELECT
                     make_date(:startYear, :startMonth, 1) AS start_date,
-                    (make_date(:endYear, :endMonth, 1) + interval '1 month' - interval '1 day') AS end_date
+                    (make_date(:endYear, :endMonth, 1) + INTERVAL '1' MONTH - INTERVAL '1' DAY) AS end_date
             ),
             monthly_totals AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::TEXT AS year,
-                    EXTRACT(MONTH FROM o.created_at)::INTEGER AS month,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalRevenue
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR) AS year,
+                    CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER) AS month,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalRevenue
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 JOIN products p ON oi.product_id = p.product_id
@@ -35,20 +35,20 @@ public interface CategoryTotalPriceByIdRepository extends JpaRepository<Category
                   AND c.deleted_at IS NULL
                   AND c.category_id = :categoryId
                   AND o.created_at BETWEEN (SELECT start_date FROM date_range) AND (SELECT end_date FROM date_range)
-                GROUP BY EXTRACT(YEAR FROM o.created_at), EXTRACT(MONTH FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS VARCHAR), CAST(EXTRACT(MONTH FROM o.created_at) AS INTEGER)
             ),
             all_months AS (
-                SELECT :startYear::TEXT AS year, :startMonth AS month, TO_CHAR(make_date(:startYear, :startMonth, 1), 'FMMonth') AS month_name
+                SELECT CAST(:startYear AS VARCHAR) AS year, CAST(:startMonth AS INTEGER) AS month, TO_CHAR(make_date(:startYear, :startMonth, 1), 'FMMonth') AS month_name
                 UNION
-                SELECT :endYear::TEXT AS year, :endMonth AS month, TO_CHAR(make_date(:endYear, :endMonth, 1), 'FMMonth') AS month_name
+                SELECT CAST(:endYear AS VARCHAR) AS year, CAST(:endMonth AS INTEGER) AS month, TO_CHAR(make_date(:endYear, :endMonth, 1), 'FMMonth') AS month_name
             )
             SELECT
                 am.year,
                 am.month_name AS month,
-                COALESCE(mt.totalRevenue, 0)::BIGINT AS totalRevenue
+                CAST(COALESCE(mt.totalRevenue, 0) AS BIGINT) AS totalRevenue
             FROM all_months am
             LEFT JOIN monthly_totals mt ON am.year = mt.year AND am.month = mt.month
-            ORDER BY am.year::INT DESC, am.month DESC
+            ORDER BY CAST(am.year AS INTEGER) DESC, am.month DESC
             """, nativeQuery = true)
     List<CategoryMonthTotalPrice> findMonthlyTotalPriceByCategoryId(
             @Param("categoryId") Long categoryId,
@@ -60,8 +60,8 @@ public interface CategoryTotalPriceByIdRepository extends JpaRepository<Category
     @Query(value = """
             WITH yearly_data AS (
                 SELECT
-                    EXTRACT(YEAR FROM o.created_at)::INTEGER AS year,
-                    COALESCE(SUM(o.total_price), 0)::BIGINT AS totalRevenue
+                    CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER) AS year,
+                    CAST(COALESCE(SUM(o.total_price), 0) AS BIGINT) AS totalRevenue
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 JOIN products p ON oi.product_id = p.product_id
@@ -72,16 +72,16 @@ public interface CategoryTotalPriceByIdRepository extends JpaRepository<Category
                   AND c.deleted_at IS NULL
                   AND c.category_id = :categoryId
                   AND EXTRACT(YEAR FROM o.created_at) IN (:year, :yearMinusOne)
-                GROUP BY EXTRACT(YEAR FROM o.created_at)
+                GROUP BY CAST(EXTRACT(YEAR FROM o.created_at) AS INTEGER)
             ),
             all_years AS (
-                SELECT :year AS year
+                SELECT CAST(:year AS INTEGER) AS year
                 UNION
-                SELECT :yearMinusOne AS year
+                SELECT CAST(:yearMinusOne AS INTEGER) AS year
             )
             SELECT
-                a.year::TEXT AS year,
-                COALESCE(yd.totalRevenue, 0)::BIGINT AS totalRevenue
+                CAST(a.year AS VARCHAR) AS year,
+                CAST(COALESCE(yd.totalRevenue, 0) AS BIGINT) AS totalRevenue
             FROM all_years a
             LEFT JOIN yearly_data yd ON a.year = yd.year
             ORDER BY a.year DESC
